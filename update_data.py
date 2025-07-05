@@ -30,6 +30,10 @@ folder_id = "1qWNDl_z2moMSds07dvv2tFzA3dYNfTB6"
 query = f"'{folder_id}' in parents and trashed=false"
 file_list = drive.ListFile({'q': query}).GetList()
 
+print("🔍 Files in folder:")
+for file in file_list:
+    print(f" - {file['title']}")
+
 target_file = None
 for file in file_list:
     if file['title'].startswith("bearable-export") and file['title'].endswith(".csv"):
