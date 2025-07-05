@@ -14,7 +14,7 @@ with open("credentials.json", "w") as f:
 
 # === Step 2: Authenticate ===
 gauth = GoogleAuth()
-gauth.LoadServiceConfigFile("credentials.json")
+gauth.LoadServiceConfig("credentials.json")
 gauth.ServiceAuth()
 drive = GoogleDrive(gauth)
 
