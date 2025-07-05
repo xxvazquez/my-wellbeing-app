@@ -25,8 +25,9 @@ gauth = GoogleAuth(settings_file="settings.yaml")
 gauth.ServiceAuth()
 drive = GoogleDrive(gauth)
 
-# === Step 4: Find latest Bearable export file ===
-query = "'root' in parents and trashed=false"
+# === Step 4: Look for Bearable export in specific folder ===
+folder_id = "1qWNDl_z2moMSds07dvv2tFzA3dYNfTB6"
+query = f"'{folder_id}' in parents and trashed=false"
 file_list = drive.ListFile({'q': query}).GetList()
 
 target_file = None
@@ -36,7 +37,7 @@ for file in file_list:
         break
 
 if not target_file:
-    raise FileNotFoundError("No Bearable export file found in Drive.")
+    raise FileNotFoundError("No Bearable export file found in the specified folder.")
 
 print(f"✅ Found file: {target_file['title']}")
 
