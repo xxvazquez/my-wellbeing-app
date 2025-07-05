@@ -14,11 +14,8 @@ with open("credentials.json", "w") as f:
 
 # === Step 2: Authenticate ===
 gauth = GoogleAuth()
-gauth.LoadCredentialsFile("credentials.json")
-if not gauth.credentials:
-    gauth.LocalWebserverAuth()
-else:
-    gauth.Authorize()
+gauth.LoadServiceConfigFile("credentials.json")
+gauth.ServiceAuth()
 drive = GoogleDrive(gauth)
 
 # === Step 3: Find latest Bearable export ===
