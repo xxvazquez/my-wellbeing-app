@@ -1,10 +1,9 @@
 import os
-import json
 import pandas as pd
 from pydrive2.auth import GoogleAuth
 from pydrive2.drive import GoogleDrive
 
-# === Step 1: Rebuild credentials.json from secret ===
+# === Step 1: Rebuild credentials.json from GitHub secret ===
 creds_raw = os.environ.get("GDRIVE_CREDENTIALS")
 if not creds_raw:
     raise RuntimeError("Missing Google Drive credentials!")
@@ -12,13 +11,21 @@ if not creds_raw:
 with open("credentials.json", "w") as f:
     f.write(creds_raw)
 
-# === Step 2: Authenticate ===
-gauth = GoogleAuth()
-gauth.LoadServiceConfig("credentials.json")
+# === Step 2: Write service settings.yaml dynamically ===
+settings_yaml = """
+client_config_backend: service
+service_config:
+  client_json_file_path: credentials.json
+"""
+with open("settings.yaml", "w") as f:
+    f.write(settings_yaml)
+
+# === Step 3: Authenticate with Google Drive ===
+gauth = GoogleAuth(settings_file="settings.yaml")
 gauth.ServiceAuth()
 drive = GoogleDrive(gauth)
 
-# === Step 3: Find latest Bearable export ===
+# === Step 4: Find latest Bearable export file ===
 query = "'root' in parents and trashed=false"
 file_list = drive.ListFile({'q': query}).GetList()
 
@@ -29,14 +36,14 @@ for file in file_list:
         break
 
 if not target_file:
-    raise FileNotFoundError("No Bearable export file found.")
+    raise FileNotFoundError("No Bearable export file found in Drive.")
 
-print(f"Found file: {target_file['title']}")
+print(f"✅ Found file: {target_file['title']}")
 
-# === Step 4: Download and read the file ===
+# === Step 5: Download and load ===
 target_file.GetContentFile("bearable_export.csv")
 df = pd.read_csv("bearable_export.csv")
 
-# === Step 5: Preview the data ===
-print("First 5 rows:")
+# === Step 6: Preview ===
+print("📄 First 5 rows of the export:")
 print(df.head())
